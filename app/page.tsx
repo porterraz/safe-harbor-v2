@@ -1,0 +1,105 @@
+"use client"
+
+import { useState, useCallback } from "react"
+import { useMoodEntries, useUserProfile } from "@/hooks/use-safe-harbor-store"
+import { LandingScreen } from "@/components/screens/landing-screen"
+import { DashboardScreen } from "@/components/screens/dashboard-screen"
+import { MoodLoggerScreen } from "@/components/screens/mood-logger-screen"
+import { ResourceScreen } from "@/components/screens/resource-screen"
+import { FluidNav } from "@/components/fluid-nav"
+import { CrisisOverlay } from "@/components/crisis-overlay"
+
+type Screen = "landing" | "dashboard" | "mood" | "resources"
+
+export default function SafeHarborApp() {
+  const { profile, isLoaded: profileLoaded, createProfile, isReturningUser } =
+    useUserProfile()
+  const { entries, isLoaded: entriesLoaded, addEntry, getTodayEntry } =
+    useMoodEntries()
+
+  const [currentScreen, setCurrentScreen] = useState<Screen>("landing")
+  const [crisisOpen, setCrisisOpen] = useState(false)
+
+  const handleNavigate = useCallback((screen: string) => {
+    setCurrentScreen(screen as Screen)
+  }, [])
+
+  const handleContinue = useCallback(() => {
+    setCurrentScreen("dashboard")
+  }, [])
+
+  const handleCreateProfile = useCallback(
+    (alias: string) => {
+      createProfile(alias)
+    },
+    [createProfile]
+  )
+
+  const todayEntry = getTodayEntry()
+
+  // Loading state
+  if (!profileLoaded || !entriesLoaded) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Loading SafeHarbor...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Landing screen (no nav)
+  if (currentScreen === "landing") {
+    return (
+      <>
+        <LandingScreen
+          isReturningUser={isReturningUser}
+          userAlias={profile?.alias}
+          onContinue={handleContinue}
+          onCreateProfile={handleCreateProfile}
+        />
+        <CrisisOverlay
+          isOpen={crisisOpen}
+          onClose={() => setCrisisOpen(false)}
+        />
+      </>
+    )
+  }
+
+  return (
+    <div className="mx-auto min-h-dvh max-w-lg">
+      {currentScreen === "dashboard" && (
+        <DashboardScreen
+          alias={profile?.alias ?? "Friend"}
+          entries={entries}
+          todayEntry={todayEntry}
+          onNavigate={handleNavigate}
+        />
+      )}
+
+      {currentScreen === "mood" && (
+        <MoodLoggerScreen
+          todayEntry={todayEntry}
+          onSave={addEntry}
+          onBack={() => setCurrentScreen("dashboard")}
+        />
+      )}
+
+      {currentScreen === "resources" && (
+        <ResourceScreen onBack={() => setCurrentScreen("dashboard")} />
+      )}
+
+      <FluidNav
+        currentScreen={currentScreen}
+        onNavigate={handleNavigate}
+        onCrisis={() => setCrisisOpen(true)}
+      />
+
+      <CrisisOverlay
+        isOpen={crisisOpen}
+        onClose={() => setCrisisOpen(false)}
+      />
+    </div>
+  )
+}
