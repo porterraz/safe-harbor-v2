@@ -10,6 +10,9 @@
 
 @layer base {
   :root {
+    --font-nunito: 'Segoe UI', 'Trebuchet MS', system-ui, sans-serif;
+    --font-dm-sans: 'Avenir Next', 'Helvetica Neue', system-ui, sans-serif;
+
     /* SafeHarbor — Sage Green, Slate Blue, Warm Cream */
     --background: 40 33% 96%;
     --foreground: 200 25% 20%;
