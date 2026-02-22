@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useMoodEntries, useUserProfile } from "@/hooks/use-safe-harbor-store"
 import { LandingScreen } from "@/components/screens/landing-screen"
 import { DashboardScreen } from "@/components/screens/dashboard-screen"
@@ -8,6 +8,7 @@ import { MoodLoggerScreen } from "@/components/screens/mood-logger-screen"
 import { ResourceScreen } from "@/components/screens/resource-screen"
 import { FluidNav } from "@/components/fluid-nav"
 import { CrisisOverlay } from "@/components/crisis-overlay"
+import { getTodayMoodAction } from "@/app/actions"
 
 type Screen = "landing" | "dashboard" | "mood" | "resources"
 
@@ -19,6 +20,7 @@ export default function SafeHarborApp() {
 
   const [currentScreen, setCurrentScreen] = useState<Screen>("landing")
   const [crisisOpen, setCrisisOpen] = useState(false)
+  const [dbEntry, setDbEntry] = useState<any>(null)
 
   const handleNavigate = useCallback((screen: string) => {
     setCurrentScreen(screen as Screen)
@@ -37,7 +39,16 @@ export default function SafeHarborApp() {
 
   const todayEntry = getTodayEntry()
 
-  // Loading state
+  useEffect(() => {
+    async function loadRealData() {
+      const data = await getTodayMoodAction()
+      if (data) {
+        setDbEntry(data)
+      }
+    }
+    loadRealData()
+  }, [currentScreen])
+
   if (!profileLoaded || !entriesLoaded) {
     return (
       <div className="flex min-h-dvh items-center justify-center">
@@ -49,7 +60,6 @@ export default function SafeHarborApp() {
     )
   }
 
-  // Landing screen (no nav)
   if (currentScreen === "landing") {
     return (
       <>
@@ -73,14 +83,14 @@ export default function SafeHarborApp() {
         <DashboardScreen
           alias={profile?.alias ?? "Friend"}
           entries={entries}
-          todayEntry={todayEntry}
+          todayEntry={dbEntry || todayEntry}
           onNavigate={handleNavigate}
         />
       )}
 
       {currentScreen === "mood" && (
         <MoodLoggerScreen
-          todayEntry={todayEntry}
+          todayEntry={dbEntry || todayEntry}
           onSave={addEntry}
           onBack={() => setCurrentScreen("dashboard")}
         />

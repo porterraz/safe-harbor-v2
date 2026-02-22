@@ -12,6 +12,7 @@ import {
   ArrowLeft,
 } from "lucide-react"
 import type { MoodEntry } from "@/hooks/use-safe-harbor-store"
+import { saveMoodEntry } from "@/app/actions"
 
 interface MoodLoggerScreenProps {
   todayEntry: MoodEntry | undefined
@@ -65,16 +66,23 @@ export function MoodLoggerScreen({
     )
   }, [])
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     const entry: Omit<MoodEntry, "id"> = {
       date: new Date().toISOString().split("T")[0],
       mood,
       sleep,
       emotions,
     }
-    onSave(entry)
-    setSaved(true)
-    setStep("done")
+    
+    const result = await saveMoodEntry(entry)
+
+    if (result.success) {
+      onSave(entry)
+      setSaved(true)
+      setStep("done")
+    } else {
+      alert("Failed to save to database")
+    }
   }, [mood, sleep, emotions, onSave])
 
   if (step === "done" || saved) {
