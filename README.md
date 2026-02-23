@@ -52,17 +52,16 @@ Verify: sqlite3 --version
 Installation and Setup
 Clone the Repository:
 
-Bash
+
 git clone <your-repo-url>
 cd safe-harbor-v2
 Install Dependencies:
 
-Bash
-pnpm install
+npm install
 Initialize the Database:
 The application uses a local SQLite file located at ./db/database.sqlite. You must initialize the schema and seed data:
 
-Bash
+
 # Create the database directory if it doesn't exist
 mkdir -p db
 
@@ -72,8 +71,8 @@ sqlite3 db/database.sqlite < db/seed.sql
 Running the Application
 Start the Development Server:
 
-Bash
-pnpm dev
+
+npm dev run
 Open the App:
 Navigate to http://localhost:3000 in your browser.
 
@@ -84,7 +83,7 @@ Trigger the Feature: Navigate to the "Mood" screen via the bottom navigation bar
 
 Confirm Database Update: In your terminal, run the following command to check the latest entry in the SQLite database:
 
-Bash
+
 sqlite3 db/database.sqlite "SELECT * FROM Mood_Entry ORDER BY entry_date DESC LIMIT 1;"
 You should see the rating and primary emotion you just submitted.
 
