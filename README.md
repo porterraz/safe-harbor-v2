@@ -1,5 +1,3 @@
-
-Gemini said
 Safe Harbor v2
 App Summary
 Safe Harbor is a mental health support application designed specifically for college students who need a private, low-barrier way to track their emotional well-being and access support resources. The app addresses the problem of students feeling overwhelmed or isolated by providing a "safe harbor" to log daily moods, track sleep patterns, and identify emotional trends over time. The primary users are students navigating campus life who may benefit from noticing stress patterns before they become critical. Key features include a mood logger, a personalized dashboard with historical data visualizations, and a curated list of crisis and counseling resources. By combining local data persistence for privacy with server-side database storage for critical entries, the product ensures that students have a reliable and immediate support tool at their fingertips.
